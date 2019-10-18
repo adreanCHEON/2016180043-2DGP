@@ -7,6 +7,7 @@ name = "PauseState"
 image = None
 blip = 0
 
+
 def enter():
     global image
     image = load_image('pause.png')
@@ -38,16 +39,15 @@ def update():
 
 def draw():
     global blip
+
     clear_canvas()
     main_state.draw()
-    if blip == 0:
-        image.draw(400, 300, 100, 100)
-        blip = 1
-    delay(0.01)
 
+    if blip == 0:
+        image.draw(400, 300, 200, 200)
+        delay(0.01)
+        blip = 1
     blip = 0
 
     update_canvas()
     pass
-
-
