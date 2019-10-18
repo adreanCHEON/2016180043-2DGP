@@ -5,7 +5,7 @@ from pico2d import *
 
 name = "PauseState"
 image = None
-
+blip = 0
 
 def enter():
     global image
@@ -37,8 +37,16 @@ def update():
 
 
 def draw():
+    global blip
     clear_canvas()
-    image.draw(400, 300)
+    main_state.draw()
+    if blip == 0:
+        image.draw(400, 300, 100, 100)
+        delay(1)
+        blip = 1
+    else:
+        blip = 0
+
     update_canvas()
     pass
 
