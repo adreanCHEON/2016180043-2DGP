@@ -42,10 +42,10 @@ def draw():
     main_state.draw()
     if blip == 0:
         image.draw(400, 300, 100, 100)
-        delay(1)
         blip = 1
-    else:
-        blip = 0
+    delay(0.01)
+
+    blip = 0
 
     update_canvas()
     pass
