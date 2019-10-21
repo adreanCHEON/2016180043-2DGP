@@ -27,6 +27,10 @@ class IdleState:
             boy.velocity -= 1
         elif event == LEFT_UP:
             boy.velocity += 1
+        if event == LSHIFT_DOWN or event == RSHIFT_DOWN:
+            boy.dash = 2
+        elif event == LSHIFT_UP or event == RSHIFT_UP:
+            boy.dash = 1
 
     @staticmethod
     def exit(boy, event):
@@ -39,7 +43,7 @@ class IdleState:
 
     @staticmethod
     def draw(boy):
-        if boy.dir == 1 or boy.dir == 4:
+        if boy.dir > 0:
             boy.image.clip_draw(boy.frame * 100, 300, 100, 100, boy.x, boy.y)
         else:
             boy.image.clip_draw(boy.frame * 100, 200, 100, 100, boy.x, boy.y)
@@ -56,6 +60,10 @@ class RunState:
             boy.velocity -= 1
         elif event == LEFT_UP:
             boy.velocity += 1
+        if event == LSHIFT_DOWN or event == RSHIFT_DOWN:
+            boy.dash = 2
+        elif event == LSHIFT_UP or event == RSHIFT_UP:
+            boy.dash = 1
         boy.dir = boy.velocity
 
     @staticmethod
@@ -66,12 +74,12 @@ class RunState:
     def do(boy):
         boy.frame = (boy.frame + 1) % 8
         boy.timer -= 1
-        boy.x += boy.velocity
+        boy.x += boy.velocity * boy.dash
         boy.x = clamp(25, boy.x, 800 - 25)
 
     @staticmethod
     def draw(boy):
-        if boy.velocity == 1 or boy.velocity == 4:
+        if boy.velocity > 0:
             boy.image.clip_draw(boy.frame * 100, 100, 100, 100, boy.x, boy.y)
         else:
             boy.image.clip_draw(boy.frame * 100, 0, 100, 100, boy.x, boy.y)
@@ -81,9 +89,9 @@ class DashState:
     @staticmethod
     def enter(boy, event):
         if event == LSHIFT_DOWN or event == RSHIFT_DOWN:
-            boy.velocity += 3
-        else:
-            boy.velocity -= 3
+            boy.dash = 2
+        elif event == LSHIFT_UP or event == RSHIFT_UP:
+            boy.dash = 1
 
     @staticmethod
     def exit(boy, event):
@@ -93,12 +101,12 @@ class DashState:
     def do(boy):
         boy.frame = (boy.frame + 1) % 8
         boy.timer -= 1
-        boy.x += boy.velocity
+        boy.x += boy.velocity * boy.dash
         boy.x = clamp(25, boy.x, 800 - 25)
 
     @staticmethod
     def draw(boy):
-        if boy.velocity == 1 or boy.velocity == 4:
+        if boy.velocity > 0:
             boy.image.clip_draw(boy.frame * 100, 100, 100, 100, boy.x, boy.y)
         else:
             boy.image.clip_draw(boy.frame * 100, 0, 100, 100, boy.x, boy.y)
@@ -113,8 +121,8 @@ next_state_table = {
                LEFT_DOWN: IdleState, RIGHT_DOWN: IdleState,
                LSHIFT_DOWN: DashState, RSHIFT_DOWN: DashState,
                LSHIFT_UP: RunState, RSHIFT_UP: RunState},
-    DashState: {RIGHT_UP: IdleState, LEFT_UP: IdleState,
-                RIGHT_DOWN: IdleState, LEFT_DOWN: IdleState,
+    DashState: {RIGHT_UP: RunState, LEFT_UP: RunState,
+                RIGHT_DOWN: RunState, LEFT_DOWN: RunState,
                 LSHIFT_DOWN: DashState, RSHIFT_DOWN: DashState,
                 LSHIFT_UP: RunState, RSHIFT_UP: RunState}
 }
@@ -126,6 +134,7 @@ class Boy:
         self.image = load_image('animation_sheet.png')
         self.dir = 1
         self.velocity = 0
+        self.dash = 1
         self.frame = 0
         self.timer = 0
         self.event_que = []
