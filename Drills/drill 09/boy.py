@@ -1,7 +1,7 @@
 from pico2d import *
 
 # Boy Event
-RIGHT_DOWN, LEFT_DOWN, RIGHT_UP, LEFT_UP, LSHIFT_DOWN, LSHIFT_UP, RSHIFT_DOWN, RSHIFT_UP = range(8)
+RIGHT_DOWN, LEFT_DOWN, RIGHT_UP, LEFT_UP, LSHIFT_DOWN, LSHIFT_UP, RSHIFT_DOWN, RSHIFT_UP, STOP_TIMER = range(9)
 
 key_event_table = {
     (SDL_KEYDOWN, SDLK_RIGHT): RIGHT_DOWN,
@@ -101,6 +101,8 @@ class DashState:
     def do(boy):
         boy.frame = (boy.frame + 1) % 8
         boy.timer -= 1
+        if boy.timer == 0:
+            boy.add_event(STOP_TIMER)
         boy.x += boy.velocity * boy.dash
         boy.x = clamp(25, boy.x, 800 - 25)
 
@@ -124,7 +126,8 @@ next_state_table = {
     DashState: {RIGHT_UP: RunState, LEFT_UP: RunState,
                 RIGHT_DOWN: RunState, LEFT_DOWN: RunState,
                 LSHIFT_DOWN: DashState, RSHIFT_DOWN: DashState,
-                LSHIFT_UP: RunState, RSHIFT_UP: RunState}
+                LSHIFT_UP: RunState, RSHIFT_UP: RunState,
+                STOP_TIMER: RunState}
 }
 
 
