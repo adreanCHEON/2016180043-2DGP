@@ -1,7 +1,8 @@
 from pico2d import *
 
 # Boy Event
-RIGHT_DOWN, LEFT_DOWN, RIGHT_UP, LEFT_UP, LSHIFT_DOWN, LSHIFT_UP, RSHIFT_DOWN, RSHIFT_UP, STOP_TIMER = range(9)
+RIGHT_DOWN, LEFT_DOWN, RIGHT_UP, LEFT_UP, LSHIFT_DOWN, \
+    LSHIFT_UP, RSHIFT_DOWN, RSHIFT_UP, STOP_TIMER, SLEEP_TIMER = range(10)
 
 key_event_table = {
     (SDL_KEYDOWN, SDLK_RIGHT): RIGHT_DOWN,
@@ -31,6 +32,7 @@ class IdleState:
             boy.dash = 2
         elif event == LSHIFT_UP or event == RSHIFT_UP:
             boy.dash = 1
+        boy.timer = 1000
 
     @staticmethod
     def exit(boy, event):
@@ -40,6 +42,8 @@ class IdleState:
     def do(boy):
         boy.frame = (boy.frame + 1) % 8
         boy.timer -= 1
+        if boy.timer == 0:
+            boy.add_event(SLEEP_TIMER)
 
     @staticmethod
     def draw(boy):
@@ -65,6 +69,7 @@ class RunState:
         elif event == LSHIFT_UP or event == RSHIFT_UP:
             boy.dash = 1
         boy.dir = boy.velocity
+        boy.timer = 1000
 
     @staticmethod
     def exit(boy, event):
@@ -88,10 +93,20 @@ class RunState:
 class DashState:
     @staticmethod
     def enter(boy, event):
+        if event == RIGHT_DOWN:
+            boy.velocity += 1
+        elif event == LEFT_DOWN:
+            boy.velocity -= 1
+        elif event == RIGHT_UP:
+            boy.velocity -= 1
+        elif event == LEFT_UP:
+            boy.velocity += 1
         if event == LSHIFT_DOWN or event == RSHIFT_DOWN:
             boy.dash = 2
         elif event == LSHIFT_UP or event == RSHIFT_UP:
             boy.dash = 1
+        boy.dir = boy.velocity
+        boy.timer = 200
 
     @staticmethod
     def exit(boy, event):
@@ -101,10 +116,10 @@ class DashState:
     def do(boy):
         boy.frame = (boy.frame + 1) % 8
         boy.timer -= 1
-        if boy.timer == 0:
-            boy.add_event(STOP_TIMER)
         boy.x += boy.velocity * boy.dash
         boy.x = clamp(25, boy.x, 800 - 25)
+        if boy.timer == 0:
+            boy.add_event(STOP_TIMER)
 
     @staticmethod
     def draw(boy):
@@ -114,20 +129,48 @@ class DashState:
             boy.image.clip_draw(boy.frame * 100, 0, 100, 100, boy.x, boy.y)
 
 
+class SleepState:
+    @staticmethod
+    def enter(boy, event):
+        boy.frame = 0
+
+    @staticmethod
+    def exit(boy, event):
+        pass
+
+    @staticmethod
+    def do(boy):
+        boy.frame = (boy.frame + 1) % 8
+
+    @staticmethod
+    def draw(boy):
+        if boy.dir == 1:
+            boy.image.clip_composite_draw(boy.frame * 100, 300, 100, 100, 3.141592 / 2,
+                                          ' ', boy.x - 25, boy.y - 25, 100, 100)
+        else:
+            boy.image.clip_composite_draw(boy.frame * 100, 200, 100, 100, 3.141592 / 2,
+                                          ' ', boy.x + 25, boy.y - 25, 100, 100)
+
+
 next_state_table = {
     IdleState: {RIGHT_UP: RunState, LEFT_UP: RunState,
                 RIGHT_DOWN: RunState, LEFT_DOWN: RunState,
                 LSHIFT_DOWN: IdleState, RSHIFT_DOWN: IdleState,
-                LSHIFT_UP: IdleState, RSHIFT_UP: IdleState},
+                LSHIFT_UP: IdleState, RSHIFT_UP: IdleState,
+                SLEEP_TIMER: SleepState},
     RunState: {RIGHT_UP: IdleState, LEFT_UP: IdleState,
                LEFT_DOWN: IdleState, RIGHT_DOWN: IdleState,
                LSHIFT_DOWN: DashState, RSHIFT_DOWN: DashState,
                LSHIFT_UP: RunState, RSHIFT_UP: RunState},
-    DashState: {RIGHT_UP: RunState, LEFT_UP: RunState,
+    DashState: {RIGHT_UP: IdleState, LEFT_UP: IdleState,
                 RIGHT_DOWN: RunState, LEFT_DOWN: RunState,
                 LSHIFT_DOWN: DashState, RSHIFT_DOWN: DashState,
                 LSHIFT_UP: RunState, RSHIFT_UP: RunState,
-                STOP_TIMER: RunState}
+                STOP_TIMER: RunState},
+    SleepState: {LEFT_DOWN: RunState, RIGHT_DOWN: RunState,
+                 LSHIFT_DOWN: IdleState, RSHIFT_DOWN: IdleState,
+                 LEFT_UP: RunState, RIGHT_UP: RunState,
+                 LSHIFT_UP: IdleState, RSHIFT_UP: IdleState}
 }
 
 
