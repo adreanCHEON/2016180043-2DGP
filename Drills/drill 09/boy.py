@@ -39,7 +39,7 @@ class IdleState:
 
     @staticmethod
     def draw(boy):
-        if boy.dir == 1 or boy.dir == 5:
+        if boy.dir == 1 or boy.dir == 4:
             boy.image.clip_draw(boy.frame * 100, 300, 100, 100, boy.x, boy.y)
         else:
             boy.image.clip_draw(boy.frame * 100, 200, 100, 100, boy.x, boy.y)
@@ -71,7 +71,7 @@ class RunState:
 
     @staticmethod
     def draw(boy):
-        if boy.velocity == 1 or boy.velocity == 5:
+        if boy.velocity == 1 or boy.velocity == 4:
             boy.image.clip_draw(boy.frame * 100, 100, 100, 100, boy.x, boy.y)
         else:
             boy.image.clip_draw(boy.frame * 100, 0, 100, 100, boy.x, boy.y)
@@ -81,15 +81,9 @@ class DashState:
     @staticmethod
     def enter(boy, event):
         if event == LSHIFT_DOWN or event == RSHIFT_DOWN:
-            if event == RIGHT_DOWN:
-                boy.velocity += 4
-            elif event == LEFT_DOWN:
-                boy.velocity -= 4
-            elif event == RIGHT_UP:
-                boy.velocity -= 4
-            elif event == LEFT_UP:
-                boy.velocity += 4
-            boy.dir = boy.velocity
+            boy.velocity += 3
+        else:
+            boy.velocity -= 3
 
     @staticmethod
     def exit(boy, event):
@@ -104,7 +98,7 @@ class DashState:
 
     @staticmethod
     def draw(boy):
-        if boy.velocity == 1 or boy.velocity == 5:
+        if boy.velocity == 1 or boy.velocity == 4:
             boy.image.clip_draw(boy.frame * 100, 100, 100, 100, boy.x, boy.y)
         else:
             boy.image.clip_draw(boy.frame * 100, 0, 100, 100, boy.x, boy.y)
