@@ -39,7 +39,7 @@ class Zombie:
         self.patrol_order = 1
         self.target_x, self.target_y = None, None
         self.x, self.y = self.patrol_positions[0]
-
+        self.bt
         self.load_images()
         self.dir = random.random()*2*math.pi # random moving direction
         self.speed = 0
@@ -54,7 +54,7 @@ class Zombie:
         self.x = clamp(50, self.x, 1280 - 50)
         self.y = clamp(50, self.y, 1024 - 50)
 
-    def wander(self):
+    def loiter(self):
         self.speed = RUN_SPEED_PPS
         self.calculate_current_position()
         self.timer -= game_framework.frame_time
@@ -99,14 +99,23 @@ class Zombie:
         pass
 
     def build_behavior_tree(self):
-        wander_node = LeafNode("Wander", self.wander)
-        find_player_node = LeafNode("Find Player", self.find_player)
-        move_to_player_node = LeafNode("Move to Player", self.move_to_player)
+        loiter_node = LeafNode("Loiter", self.wander)
+        search_ball_node = LeafNode("Search Ball", self.search_ball)
+        move_to_ball_node = LeafNode("Move to Ball", self.move_to_ball)
+        run_from_player_node = LeafNode("Run from Player", self.run_from_player)
+        kill_player_node = LeafNode("Kill player", self.kill_player)
+        search_player_node = LeafNode("Search Player", self.search_player)
+        move_player_node = SequenceNode("Move Player")
+        move_player_node.add_children(kill_player_node, run_from_player_node)
+        player_chase_node = SequenceNode("Player Chase")
+        player_chase_node.add_children(search_player_node, move_player_node)
+        ball_chase_node = SequenceNode("Ball Chase")
+        ball_chase_node.add_children(move_to_ball_node, search_ball_node)
         chase_node = SequenceNode("Chase")
-        chase_node.add_children(find_player_node, move_to_player_node)
-        wander_chase_node = SelectorNode("WanderChase")
-        wander_chase_node.add_children(chase_node, wander_node)
-        self.bt = BehaviorTree(wander_chase_node)
+        chase_node.add_children(player_chase_node, ball_chase_node)
+        action_node = SelectorNode("Action")
+        action_node.add_children(chase_node, loiter_node)
+        self.bt = BehaviorTree(action_node)
         pass
 
     def get_bb(self):

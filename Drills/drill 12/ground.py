@@ -1,5 +1,6 @@
 from pico2d import *
 
+
 class Ground:
     def __init__(self):
         self.image = load_image('KPU_GROUND.png')

@@ -119,7 +119,6 @@ class Boy:
         # fill here
         return self.x - 50, self.y - 50, self.x + 50, self.y + 50
 
-
     def add_event(self, event):
         self.event_que.insert(0, event)
 

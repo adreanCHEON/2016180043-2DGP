@@ -30,7 +30,6 @@ def collide(a, b):
     return True
 
 
-
 def get_boy():
     return boy
 
@@ -47,8 +46,10 @@ def enter():
     ground = Ground()
     game_world.add_object(ground, 0)
 
+
 def exit():
     game_world.clear()
+
 
 def pause():
     pass
