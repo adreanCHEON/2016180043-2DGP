@@ -57,8 +57,6 @@ class WalkingState:
         elif event == DOWNKEY_UP:
             boy.y_velocity += RUN_SPEED_PPS
 
-
-
     @staticmethod
     def exit(boy, event):
         if event == SPACE:
@@ -128,6 +126,8 @@ class Boy:
         self.cur_state = WalkingState
         self.cur_state.enter(self, None)
         self.start_time = get_time()
+
+        self.rank = []
 
     def __getstate__(self):
         state = {'x': self.x, 'y': self.y, 'dir': self.dir, 'cur_state': self.cur_state}

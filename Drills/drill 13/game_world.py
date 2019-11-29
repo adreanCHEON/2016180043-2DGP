@@ -1,8 +1,10 @@
 import pickle
+import json
 
 # layer 0: Background Objects
 # layer 1: Foreground Objects
-objects = [[],[]]
+objects = [[], []]
+rank = []
 
 
 def add_object(o, layer):
@@ -11,7 +13,6 @@ def add_object(o, layer):
 
 def add_objects(l, layer):
     objects[layer] += l
-
 
 
 def remove_object(o):
@@ -38,6 +39,17 @@ def load():
     global objects
     with open('game.sav', 'rb') as f:
         objects = pickle.load(f)
+
+
+def rank_save():
+    with open('rank.json', 'wb') as f:
+        pickle.dump(rank, f)
+
+
+def rank_load():
+    global rank
+    with open('rank.json', 'rb') as f:
+        rank = pickle.load(f)
 
 
 def all_objects():

@@ -86,7 +86,6 @@ class Zombie:
         wander_chase_node.add_children(chase_node, wander_node)
         self.bt = BehaviorTree(wander_chase_node)
 
-
     def get_bb(self):
         return self.x - 50, self.y - 50, self.x + 50, self.y + 50
 
@@ -112,6 +111,7 @@ class Zombie:
                 Zombie.images['Walk'][int(self.frame)].draw(self.x, self.y, tw, th)
 
         Zombie.font.draw(self.x - 30, self.y + 50, self.name, (255, 255, 0))
+        draw_rectangle(*self.get_bb())
 
     def handle_event(self, event):
         pass

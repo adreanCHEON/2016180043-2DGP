@@ -8,6 +8,7 @@ import game_framework
 import game_world
 
 import world_build_state
+import rank_state
 
 name = "MainState"
 
